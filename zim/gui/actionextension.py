@@ -38,7 +38,10 @@ def populate_toolbar_with_actions(toolbar, *extendables, include_headercontrols=
 				pass
 			elif ('toolbar' in action.menuhints or 'headerbar' in action.menuhints) \
 				or (action.hasicon and ('view' in action.menuhints or 'tools' in action.menuhints)):
-					button = action.create_tool_button(fallback_icon='system-run')
+					if 'entry' in action.menuhints:
+						button = action.create_entry()
+					else:
+						button = action.create_tool_button(fallback_icon='system-run')
 					if 'is_important' in action.menuhints:
 						button.set_is_important(True) # Ensure text is shown by default
 

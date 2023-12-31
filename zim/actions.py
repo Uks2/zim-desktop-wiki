@@ -171,6 +171,7 @@ class ActionMethod(BoundActionMethod):
 
 	_button_class = Gtk.Button if Gtk is not None else None
 	_tool_button_class = Gtk.ToolButton if Gtk is not None else None
+	_entry_class = Gtk.Entry if Gtk is not None else None
 
 	def create_button(self):
 		assert Gtk is not None
@@ -203,6 +204,23 @@ class ActionMethod(BoundActionMethod):
 		if connect_button:
 			self.connect_button(button)
 		return button
+
+	def create_entry( self, fallback_icon = None,
+			connect_button = True ):
+		assert Gtk is not None
+		self.entry = self._entry_class()
+		self.entry.set_tooltip_text( self.tooltip )
+		icon_name = self.verb_icon or self.icon or fallback_icon
+		self.entry.set_icon_from_icon_name(
+			Gtk.EntryIconPosition.PRIMARY, icon_name )
+		item = Gtk.ToolItem()
+		item.add( self.entry )
+		if connect_button:
+			self.entry.connect( "activate", self._on_activate_proxy );
+			self.entry.connect(
+				"icon-release", self._on_activate_proxy );
+			self._proxies.add( self.entry );
+		return item
 
 	def connect_button(self, button):
 		button.connect('clicked', self._on_activate_proxy)
