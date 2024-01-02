@@ -183,6 +183,14 @@ class ViMainWindowExtension( MainWindowExtension ):
 
 class ViPageViewExtension( PageViewExtension ):
 
+	excmds = [
+		( [ "w", "write" ], lambda self, argv :
+			self.pageview.save_page() ),
+		( [ "q", "quit", "qa", "x", "xa", "xit", "exit" ],
+			lambda self, argv :
+				Gtk.main_quit() if Gtk.main_level() > 0 else None ),
+	]
+
 	def __init__( self, plugin, window ):
 
 		PageViewExtension.__init__( self, plugin, window )
@@ -191,7 +199,13 @@ class ViPageViewExtension( PageViewExtension ):
 	@action( _( "_Ex Input" ), accelerator="F6", icon="system-run",
 		menuhints="tools:entry" )
 	def ex( self ):
-		print( "Ex mode:", self.ex.entry.get_text() )
+
+		text = [ i for i in self.ex.entry.get_text().split( " " )
+			if i != "" ]
+		for cmd in self.excmds:
+			if text[0] in cmd[0]:
+				cmd[1]( self, text )
+
 		self.ex.entry.set_text( "" )
 		if None != self.ex._return_widget:
 			self.ex._return_widget.grab_focus()
