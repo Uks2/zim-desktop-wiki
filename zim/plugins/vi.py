@@ -4,6 +4,7 @@ from zim.gui.mainwindow import MainWindowExtension
 from zim.gui.pageview import PageViewExtension
 from gi.repository import Gdk
 from gi.repository import Gtk
+from gi.repository import GObject
 from enum import Enum
 
 class ViPlugin(PluginClass):
@@ -81,6 +82,7 @@ class ViMainWindowExtension( MainWindowExtension ):
 
 		self.insert_mode = False
 		self.keybuffer = []
+		self.timeout = None
 
 	def on_key_press_event( self, widget, event ):
 
@@ -116,6 +118,13 @@ class ViMainWindowExtension( MainWindowExtension ):
 
 			while self.match( False ):
 				pass
+
+		if None != self.timeout:
+			GObject.source_remove( self.timeout )
+			self.timeout = None
+		if 0 < len( self.keybuffer ) and self.insert_mode:
+			self.timeout = GObject.timeout_add(
+				1000, self.timeout_handler )
 
 		return True
 
@@ -181,6 +190,11 @@ class ViMainWindowExtension( MainWindowExtension ):
 				return self.Match.PARTIAL, start, l
 
 		return self.Match.NONE, 0, 0
+
+	def timeout_handler( self ):
+
+		self.match( True )
+		self.timeout = None
 
 class ViPageViewExtension( PageViewExtension ):
 
