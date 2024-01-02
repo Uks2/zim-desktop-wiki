@@ -61,6 +61,7 @@ class ViMainWindowExtension( MainWindowExtension ):
 			setattr( self.plugin._ex_input, "_return_widget", self.tv ),
 			self.plugin._ex_input.entry.set_text( "" ),
 			self.plugin._ex_input.entry.grab_focus() ) ),
+		( [ "slash" ], lambda self: self.window.pageview.show_find() ),
 	]
 
 	ibinds = [
